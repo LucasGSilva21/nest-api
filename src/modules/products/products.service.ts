@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationOptions } from '../../shared/types/pagination.types';
+import { calculateOffset } from '../../shared/helpers/pagination.helper';
 
 @Injectable()
 export class ProductsService {
@@ -20,8 +22,18 @@ export class ProductsService {
     return { id };
   }
 
-  async findAll() {
-    return this.productsRepository.find();
+  async findAll(options: PaginationOptions) {
+    const { page, perPage } = options;
+
+    const [result, total] = await this.productsRepository.findAndCount({
+      take: perPage,
+      skip: calculateOffset(page, perPage),
+    });
+
+    return {
+      data: result,
+      count: total,
+    };
   }
 
   async findOne(id: string) {
