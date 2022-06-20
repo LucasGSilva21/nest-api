@@ -37,6 +37,10 @@ export class UsersService {
     return { id };
   }
 
+  async findOneByCriteria(criteria: Partial<User>): Promise<User> {
+    return this.usersRepository.findOne({ where: criteria as any });
+  }
+
   async findAll() {
     return this.usersRepository.find();
   }

@@ -9,5 +9,6 @@ import { CryptographyHelper } from '../../shared/helpers/cryptography.helper';
   imports: [TypeOrmModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService, CryptographyHelper],
+  exports: [UsersService],
 })
 export class UsersModule {}
