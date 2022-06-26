@@ -3,10 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
+import { Sale } from '../../sales/entities/sale.entity';
 import { compareSync } from 'bcrypt';
 import { UserRoleType } from './userRole.type';
 
@@ -47,6 +48,9 @@ export class User {
     type: 'timestamp',
   })
   updatedAt: Date;
+
+  @OneToMany(() => Sale, (sale) => sale.user)
+  sales: Sale[];
 
   validatePassword(password: string): boolean {
     return compareSync(password, this.password);
