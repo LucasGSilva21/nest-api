@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptographyHelper } from '../../shared/helpers/cryptography.helper';
+import { RabbitMQServer } from '../../shared/helpers/rabbitmq.helper';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,9 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    const server = new RabbitMQServer('amqp://admin:admin@rabbitmq:5672');
+    await server.start();
+
     const { name, email, password } = createUserDto;
 
     const user = await this.usersRepository.findOne({
@@ -33,6 +37,8 @@ export class UsersService {
     });
 
     const { id } = await this.usersRepository.save(newUser);
+
+    await server.publishInQueue('verify-user-email', JSON.stringify({ email }));
 
     return { id };
   }
